@@ -1,20 +1,25 @@
-FROM python:3.12-slim
+# Étape 1 : base image plus légère
+FROM python:3.11-slim
 
-# 1) avoir ffmpeg pour ton /analyze/video
-RUN apt-get update && apt-get install -y ffmpeg && rm -rf /var/lib/apt/lists/*
+# Étape 2 : installation minimale des dépendances système
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ffmpeg \
+    libsm6 \
+    libxext6 \
+    && rm -rf /var/lib/apt/lists/*
 
+# Étape 3 : création du dossier d’app
 WORKDIR /app
 
-# 2) copier les dépendances
-COPY requirements.txt /app/requirements.txt
-RUN pip install --no-cache-dir -r /app/requirements.txt
+# Étape 4 : copier requirements et installer en mode optimisé
+COPY requirements.txt .
 
-# 3) copier le code
-COPY . /app
+# Installation allégée sans cache ni dev packages
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Railway fournit la variable d'env PORT
-ENV PYTHONUNBUFFERED=1
+# Étape 5 : copier le code applicatif
+COPY . .
 
-# 4) lancer uvicorn, en écoutant sur 0.0.0.0:$PORT (très important)
-CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
+# Étape 6 : lancer FastAPI via uvicorn
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080"]
 
