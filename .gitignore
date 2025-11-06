@@ -1,0 +1,14 @@
+# Environnements virtuels
+venv/
+__pycache__/
+*.pyc
+
+# Fichiers uploadés localement
+uploads/
+
+# Dossiers temporaires / caches
+*.log
+.DS_Store
+.idea/
+.vscode/
+
