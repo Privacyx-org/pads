@@ -1,21 +1,17 @@
 FROM python:3.11-slim
 
-# libs nécessaires pour opencv-headless et ffmpeg
+# ffmpeg seulement, plus d'opencv ni libs graphiques
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ffmpeg \
-    libsm6 \
-    libxext6 \
-    libgl1 \
-    libglib2.0-0 \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-# on installe d'abord les deps
+# deps Python (très light)
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# on copie le code
+# code
 COPY . .
 
 # Railway fournit $PORT, on l'utilise, sinon 8000 en local
